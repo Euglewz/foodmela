@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --color-cream: rgb(241, 223, 196);
+  --color-maroon: rgb(131, 34, 41);
+  --color-maroon-dark: rgb(101, 24, 30);
+  --color-ink: rgb(51, 30, 26);
+}
+
+@theme inline {
+  --color-cream: var(--color-cream);
+  --color-maroon: var(--color-maroon);
+  --color-maroon-dark: var(--color-maroon-dark);
+  --color-ink: var(--color-ink);
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-playfair);
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}

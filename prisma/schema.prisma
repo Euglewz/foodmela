@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  RIDER
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  address      String?
+  avatarUrl    String?
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+
+  managerRestaurants ManagerRestaurant[]
+  ordersAsCustomer   Order[]             @relation("CustomerOrders")
+  ordersAsRider      Order[]             @relation("RiderOrders")
+  activity           ActivityLog[]
+}
+
+model Restaurant {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+
+  managers  ManagerRestaurant[]
+  menuItems MenuItem[]
+  orders    Order[]
+}
+
+model ManagerRestaurant {
+  id           String @id @default(cuid())
+  userId       String
+  restaurantId String
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+}
+
+model MenuItem {
+  id                String   @id @default(cuid())
+  restaurantId      String
+  name              String
+  description       String
+  price             Float?
+  imageUrl          String?
+  category          String
+  availabilityDays  String
+  availabilityStart String?
+  availabilityEnd   String?
+  isAvailable       Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  restaurantId  String
+  customerId    String
+  riderId       String?
+  status        OrderStatus @default(PENDING)
+  total         Float
+  sector        String
+  roadNumber    String
+  houseDetails  String
+  paymentMethod String
+  createdAt     DateTime    @default(now())
+  deliveredAt   DateTime?
+
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id])
+  customer   User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  rider      User?       @relation("RiderOrders", fields: [riderId], references: [id])
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  menuItemId String?
+  name       String
+  price      Float
+  qty        Int
+
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem? @relation(fields: [menuItemId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  detail    String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
