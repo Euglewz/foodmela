@@ -29,7 +29,15 @@ const STATUS_FLOW: Record<string, string[]> = {
   CANCELLED: [],
 };
 
-export default function OrdersManager({ canAssignRider = true }: { canAssignRider?: boolean }) {
+const DELIVERY_STATUSES = ["OUT_FOR_DELIVERY", "DELIVERED"];
+
+export default function OrdersManager({
+  canAssignRider = true,
+  canMarkDelivery = true,
+}: {
+  canAssignRider?: boolean;
+  canMarkDelivery?: boolean;
+}) {
   const [tab, setTab] = useState<"current" | "history">("current");
   const [orders, setOrders] = useState<ApiOrder[]>([]);
   const [riders, setRiders] = useState<Rider[]>([]);
@@ -139,16 +147,18 @@ export default function OrdersManager({ canAssignRider = true }: { canAssignRide
 
               {tab === "current" && (
                 <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-maroon/15 pt-4">
-                  {STATUS_FLOW[order.status]?.map((next) => (
-                    <button
-                      key={next}
-                      type="button"
-                      onClick={() => updateStatus(order.id, next)}
-                      className="rounded-full border border-maroon/20 px-4 py-1.5 text-xs font-semibold text-maroon transition-colors hover:bg-maroon/5"
-                    >
-                      Mark {ORDER_STATUS_LABEL[next]}
-                    </button>
-                  ))}
+                  {STATUS_FLOW[order.status]
+                    ?.filter((next) => canMarkDelivery || !DELIVERY_STATUSES.includes(next))
+                    .map((next) => (
+                      <button
+                        key={next}
+                        type="button"
+                        onClick={() => updateStatus(order.id, next)}
+                        className="rounded-full border border-maroon/20 px-4 py-1.5 text-xs font-semibold text-maroon transition-colors hover:bg-maroon/5"
+                      >
+                        Mark {ORDER_STATUS_LABEL[next]}
+                      </button>
+                    ))}
 
                   {canAssignRider && (
                     <select
@@ -167,11 +177,14 @@ export default function OrdersManager({ canAssignRider = true }: { canAssignRide
                 </div>
               )}
 
-              {order.rider && (
-                <p className="mt-2 text-xs text-ink/50">
-                  Rider: {order.rider.name} {order.rider.phone ? `(${order.rider.phone})` : ""}
-                </p>
-              )}
+              {order.rider &&
+                (order.status === "DELIVERED" ? (
+                  <p className="mt-2 text-xs text-ink/50">Delivered by: {order.rider.name}</p>
+                ) : (
+                  <p className="mt-2 text-xs text-ink/50">
+                    Rider: {order.rider.name} {order.rider.phone ? `(${order.rider.phone})` : ""}
+                  </p>
+                ))}
             </div>
           ))}
         </div>

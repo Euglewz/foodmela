@@ -1,12 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState, type FormEvent } from "react";
 import AvatarUpload from "@/components/AvatarUpload";
+import GoogleAuthButton, { googleErrorMessage } from "@/components/GoogleAuthButton";
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const googleError = googleErrorMessage(useSearchParams().get("error"));
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -57,7 +67,19 @@ export default function RegisterPage() {
         Food Mela staff.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+      <div className="mt-8">
+        <GoogleAuthButton label="Continue with Google" />
+        {googleError && (
+          <p className="mt-3 rounded-lg bg-maroon/10 px-3 py-2 text-sm text-maroon">{googleError}</p>
+        )}
+        <div className="mt-6 flex items-center gap-3 text-xs text-ink/40">
+          <span className="h-px flex-1 bg-maroon/15" />
+          or register with email
+          <span className="h-px flex-1 bg-maroon/15" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         {error && (
           <p className="rounded-lg bg-maroon/10 px-3 py-2 text-sm text-maroon">{error}</p>
         )}

@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
+import GoogleAuthButton, { googleErrorMessage } from "@/components/GoogleAuthButton";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
+  const googleError = googleErrorMessage(searchParams.get("error"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +48,19 @@ function LoginForm() {
         Customer, Rider, Manager &amp; Admin accounts all log in here.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+      <div className="mt-8">
+        <GoogleAuthButton label="Continue with Google" />
+        {googleError && (
+          <p className="mt-3 rounded-lg bg-maroon/10 px-3 py-2 text-sm text-maroon">{googleError}</p>
+        )}
+        <div className="mt-6 flex items-center gap-3 text-xs text-ink/40">
+          <span className="h-px flex-1 bg-maroon/15" />
+          or log in with email
+          <span className="h-px flex-1 bg-maroon/15" />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         {error && (
           <p className="rounded-lg bg-maroon/10 px-3 py-2 text-sm text-maroon">{error}</p>
         )}

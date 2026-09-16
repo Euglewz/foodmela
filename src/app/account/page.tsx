@@ -89,11 +89,14 @@ export default async function AccountPage() {
                 <span className="font-serif text-lg font-semibold text-maroon">{formatTk(order.total)}</span>
               </div>
 
-              {order.rider && (
-                <p className="mt-2 text-xs text-ink/50">
-                  Rider: {order.rider.name} ({order.rider.phone})
-                </p>
-              )}
+              {order.rider &&
+                (order.status === "DELIVERED" ? (
+                  <p className="mt-2 text-xs text-ink/50">Delivered by: {order.rider.name}</p>
+                ) : (
+                  <p className="mt-2 text-xs text-ink/50">
+                    Rider: {order.rider.name} ({order.rider.phone})
+                  </p>
+                ))}
             </div>
           ))}
         </div>
