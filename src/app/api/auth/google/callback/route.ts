@@ -38,6 +38,7 @@ export async function GET(request: Request) {
   let user = await prisma.user.findFirst({
     where: { OR: [{ googleId: profile.sub }, { email: profile.email }] },
   });
+  const isNewUser = !user;
 
   if (user) {
     if (!user.googleId) {
@@ -61,7 +62,9 @@ export async function GET(request: Request) {
   }
 
   const token = await createSessionToken({ userId: user.id, role: user.role });
-  const response = NextResponse.redirect(`${origin}${dashboardPathForRole(user.role)}`);
+  const response = NextResponse.redirect(
+    isNewUser ? `${origin}/` : `${origin}${dashboardPathForRole(user.role)}`,
+  );
   response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",

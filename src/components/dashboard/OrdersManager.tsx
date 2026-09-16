@@ -145,20 +145,21 @@ export default function OrdersManager({
                 <span className="text-maroon">{formatTk(order.total)}</span>
               </div>
 
-              {tab === "current" && (
+              {(tab === "current" || (canAssignRider && order.status === "CONFIRMED")) && (
                 <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-maroon/15 pt-4">
-                  {STATUS_FLOW[order.status]
-                    ?.filter((next) => canMarkDelivery || !DELIVERY_STATUSES.includes(next))
-                    .map((next) => (
-                      <button
-                        key={next}
-                        type="button"
-                        onClick={() => updateStatus(order.id, next)}
-                        className="rounded-full border border-maroon/20 px-4 py-1.5 text-xs font-semibold text-maroon transition-colors hover:bg-maroon/5"
-                      >
-                        Mark {ORDER_STATUS_LABEL[next]}
-                      </button>
-                    ))}
+                  {tab === "current" &&
+                    STATUS_FLOW[order.status]
+                      ?.filter((next) => canMarkDelivery || !DELIVERY_STATUSES.includes(next))
+                      .map((next) => (
+                        <button
+                          key={next}
+                          type="button"
+                          onClick={() => updateStatus(order.id, next)}
+                          className="rounded-full border border-maroon/20 px-4 py-1.5 text-xs font-semibold text-maroon transition-colors hover:bg-maroon/5"
+                        >
+                          Mark {ORDER_STATUS_LABEL[next]}
+                        </button>
+                      ))}
 
                   {canAssignRider && (
                     <select

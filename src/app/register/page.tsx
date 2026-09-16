@@ -48,7 +48,7 @@ function RegisterForm() {
         setError(data.error ?? "Something went wrong.");
         return;
       }
-      router.push(data.redirectTo ?? "/account");
+      router.push("/");
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");

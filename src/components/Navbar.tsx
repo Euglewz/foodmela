@@ -194,7 +194,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <nav className="flex flex-col gap-1 border-t border-cream/20 px-4 pb-4 md:hidden">
+        <nav className="flex flex-col gap-1 border-t border-cream/20 bg-maroon px-4 pb-4 shadow-lg md:hidden">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}

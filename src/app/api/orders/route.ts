@@ -30,12 +30,16 @@ export async function GET(request: Request) {
     where = { customerId: session.userId };
   }
 
+  // Managers only confirm orders, so anything past PENDING is history for them.
+  const currentStatuses =
+    session.role === "MANAGER" ? ["PENDING"] : ["PENDING", "CONFIRMED", "OUT_FOR_DELIVERY"];
+
   if (statusParam) {
     where.status = statusParam;
   } else if (scope === "current") {
-    where.status = { in: ["PENDING", "CONFIRMED", "OUT_FOR_DELIVERY"] };
+    where.status = { in: currentStatuses };
   } else if (scope === "history") {
-    where.status = { in: ["DELIVERED", "CANCELLED"] };
+    where.status = { notIn: currentStatuses };
   }
 
   const orders = await prisma.order.findMany({
