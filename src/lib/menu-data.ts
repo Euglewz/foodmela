@@ -2,11 +2,8 @@ import { prisma } from "@/lib/prisma";
 import type { MenuItemDTO } from "@/lib/menu-types";
 
 export async function getMenuItemsForRestaurant(slug: string): Promise<MenuItemDTO[]> {
-  const restaurant = await prisma.restaurant.findUnique({ where: { slug } });
-  if (!restaurant) return [];
-
   const items = await prisma.menuItem.findMany({
-    where: { restaurantId: restaurant.id },
+    where: { restaurant: { slug } },
     orderBy: [{ category: "asc" }, { name: "asc" }],
   });
 
