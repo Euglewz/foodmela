@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, requireRole } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { formatTk } from "@/lib/currency";
 import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
@@ -6,6 +6,7 @@ import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
+  await requireRole("CUSTOMER");
   const user = await getCurrentUser();
   if (!user) return null;
 

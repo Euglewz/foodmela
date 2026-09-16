@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { requireRole } from "@/lib/session";
 
 const LINKS = [
   { href: "/manager", label: "Dashboard Overview", icon: "📊" },
@@ -8,7 +9,8 @@ const LINKS = [
   { href: "/manager/orders", label: "Manage Orders", icon: "🧾" },
 ];
 
-export default function ManagerLayout({ children }: { children: ReactNode }) {
+export default async function ManagerLayout({ children }: { children: ReactNode }) {
+  await requireRole("MANAGER");
   return (
     <div className="flex flex-1 flex-col md:flex-row">
       <Sidebar title="Manager Dashboard" links={LINKS} />

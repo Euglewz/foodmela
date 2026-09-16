@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { requireRole } from "@/lib/session";
 
 const LINKS = [
   { href: "/rider", label: "My Orders", icon: "🧾" },
   { href: "/rider/history", label: "Delivery History", icon: "🛵" },
 ];
 
-export default function RiderLayout({ children }: { children: ReactNode }) {
+export default async function RiderLayout({ children }: { children: ReactNode }) {
+  await requireRole("RIDER");
   return (
     <div className="flex flex-1 flex-col md:flex-row">
       <Sidebar title="Rider Dashboard" links={LINKS} />

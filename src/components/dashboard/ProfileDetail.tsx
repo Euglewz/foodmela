@@ -60,6 +60,13 @@ export default function ProfileDetail({
   }, [userId]);
 
   async function changeRole(role: string, restaurantIds?: string[]) {
+    const ROLE_RANK: Record<string, number> = { CUSTOMER: 0, RIDER: 1, MANAGER: 2, ADMIN: 3 };
+    if (user && ROLE_RANK[role] < ROLE_RANK[user.role]) {
+      const ok = window.confirm(
+        `Demote ${user.name} from ${user.role.toLowerCase()} to ${role.toLowerCase()}? They will lose access to the ${user.role.toLowerCase()} dashboard.`,
+      );
+      if (!ok) return;
+    }
     setError(null);
     setSaving(true);
     try {
@@ -160,7 +167,7 @@ export default function ProfileDetail({
                     onClick={() => changeRole("RIDER")}
                     className="rounded-full border border-maroon/20 px-4 py-2 text-sm font-semibold text-maroon transition-colors hover:bg-maroon/5 disabled:opacity-50"
                   >
-                    Promote to Rider
+                    {user.role === "MANAGER" ? "Demote to Rider" : "Promote to Rider"}
                   </button>
                 )}
                 {user.role !== "CUSTOMER" && (
@@ -170,7 +177,7 @@ export default function ProfileDetail({
                     onClick={() => changeRole("CUSTOMER")}
                     className="rounded-full border border-maroon/20 px-4 py-2 text-sm font-semibold text-ink/60 transition-colors hover:bg-maroon/5 disabled:opacity-50"
                   >
-                    Revert to Customer
+                    Demote to Customer
                   </button>
                 )}
               </>
@@ -192,14 +199,16 @@ export default function ProfileDetail({
                 onClick={() => changeRole("CUSTOMER")}
                 className="rounded-full border border-maroon/20 px-4 py-2 text-sm font-semibold text-ink/60 transition-colors hover:bg-maroon/5 disabled:opacity-50"
               >
-                Revert to Customer
+                Demote to Customer
               </button>
             )}
           </div>
 
           {mode === "admin" && (
             <div className="mt-5 border-t border-maroon/15 pt-4">
-              <p className="text-sm font-medium text-ink">Promote to Manager for:</p>
+              <p className="text-sm font-medium text-ink">
+                {user.role === "MANAGER" ? "Manages:" : "Promote to Manager for:"}
+              </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {restaurants.map((r) => (
                   <button
@@ -226,7 +235,7 @@ export default function ProfileDetail({
                 onClick={() => changeRole("MANAGER", selectedRestaurants)}
                 className="mt-3 rounded-full bg-maroon px-4 py-2 text-sm font-semibold text-cream transition-colors hover:bg-maroon-dark disabled:opacity-50"
               >
-                Promote to Manager
+                {user.role === "MANAGER" ? "Update Restaurants" : "Promote to Manager"}
               </button>
             </div>
           )}

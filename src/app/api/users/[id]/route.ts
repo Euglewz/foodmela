@@ -79,8 +79,25 @@ export async function PATCH(request: Request, { params }: Params) {
     }
   }
 
+  const leavingRiderRole = target.role === "RIDER" && newRole !== "RIDER";
+  if (leavingRiderRole) {
+    const inTransit = await prisma.order.count({ where: { riderId: id, status: "OUT_FOR_DELIVERY" } });
+    if (inTransit > 0) {
+      return NextResponse.json(
+        { error: "This rider has orders out for delivery. Wait until they are delivered before changing the role." },
+        { status: 400 },
+      );
+    }
+  }
+
   await prisma.$transaction(async (tx) => {
     await tx.user.update({ where: { id }, data: { role: newRole } });
+    if (leavingRiderRole) {
+      await tx.order.updateMany({
+        where: { riderId: id, status: { in: ["PENDING", "CONFIRMED"] } },
+        data: { riderId: null },
+      });
+    }
     await tx.managerRestaurant.deleteMany({ where: { userId: id } });
     if (newRole === "MANAGER" && restaurantIds.length > 0) {
       await tx.managerRestaurant.createMany({
