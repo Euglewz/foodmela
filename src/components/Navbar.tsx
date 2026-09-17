@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { NAVBAR_HEIGHT_PX } from "@/lib/layout-constants";
+import { useHideWhileScrolling } from "@/lib/use-hide-while-scrolling";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -44,6 +45,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
+  const scrolling = useHideWhileScrolling();
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +72,15 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  function handleLogoClick(e: React.MouseEvent) {
+    setOpen(false);
+    // Already home: scroll back to the top instead of reloading the page.
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
@@ -81,13 +92,15 @@ export default function Navbar() {
 
   return (
     <header
-      className="sticky top-0 z-50 bg-maroon text-cream shadow-md"
+      className={`sticky top-0 z-50 bg-maroon text-cream shadow-md transition-transform duration-200 ${
+        scrolling && !open ? "-translate-y-full" : "translate-y-0"
+      }`}
       style={{ height: NAVBAR_HEIGHT_PX }}
     >
       <div
         className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6"
       >
-        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+        <Link href="/" className="flex items-center gap-3" onClick={handleLogoClick}>
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-cream p-1.5 sm:h-12 sm:w-12">
             <Image
               src="/images/food_mela_logo.png"
@@ -146,7 +159,7 @@ export default function Navbar() {
                     onClick={() => setMenuOpen(false)}
                     className="block px-4 py-2.5 text-sm text-ink/80 transition-colors hover:bg-maroon/5"
                   >
-                    Dashboard
+                    {user.role === "CUSTOMER" ? "My Orders" : "Dashboard"}
                   </Link>
                   <button
                     type="button"
@@ -227,7 +240,7 @@ export default function Navbar() {
                   onClick={() => setOpen(false)}
                   className="rounded-md px-2 py-2.5 text-center text-sm font-medium text-cream/90 transition-colors hover:bg-cream/10 hover:text-cream"
                 >
-                  Dashboard
+                  {user.role === "CUSTOMER" ? "My Orders" : "Dashboard"}
                 </Link>
                 <button
                   type="button"

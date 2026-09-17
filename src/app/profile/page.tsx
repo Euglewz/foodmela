@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import ProfileEditor from "@/components/ProfileEditor";
 import { getCurrentUser } from "@/lib/session";
 import { dashboardPathForRole } from "@/lib/auth";
 
@@ -45,11 +46,15 @@ export default async function ProfilePage() {
         </dl>
       </div>
 
+      <ProfileEditor
+        initial={{ name: user.name, phone: user.phone ?? "", address: user.address ?? "" }}
+      />
+
       <Link
         href={dashboardPathForRole(user.role)}
         className="mt-6 inline-flex w-fit items-center gap-2 self-center rounded-full bg-maroon px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-maroon-dark"
       >
-        Go to Dashboard
+        {user.role === "CUSTOMER" ? "My Orders" : "Go to Dashboard"}
       </Link>
     </div>
   );

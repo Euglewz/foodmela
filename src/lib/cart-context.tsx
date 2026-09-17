@@ -23,6 +23,7 @@ type CartContextValue = {
   qtyOf: (restaurant: RestaurantSlug, itemId: string) => number;
   increment: (restaurant: RestaurantSlug, itemId: string) => void;
   decrement: (restaurant: RestaurantSlug, itemId: string) => void;
+  setQty: (restaurant: RestaurantSlug, itemId: string, qty: number) => void;
   cartOf: (restaurant: RestaurantSlug) => Record<string, number>;
   clearCart: (restaurant: RestaurantSlug) => void;
 };
@@ -80,6 +81,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return { ...prev, [restaurant]: restaurantCart };
     });
 
+  const setQty = (restaurant: RestaurantSlug, itemId: string, qty: number) =>
+    setCarts((prev) => {
+      const restaurantCart = { ...prev[restaurant] };
+      if (qty <= 0) delete restaurantCart[itemId];
+      else restaurantCart[itemId] = qty;
+      return { ...prev, [restaurant]: restaurantCart };
+    });
+
   const qtyOf = (restaurant: RestaurantSlug, itemId: string) =>
     carts[restaurant]?.[itemId] ?? 0;
 
@@ -90,7 +99,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ qtyOf, increment, decrement, cartOf, clearCart }}
+      value={{ qtyOf, increment, decrement, setQty, cartOf, clearCart }}
     >
       {children}
     </CartContext.Provider>

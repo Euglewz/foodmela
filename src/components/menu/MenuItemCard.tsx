@@ -9,9 +9,7 @@ type MenuItemCardProps = {
   /** Always-shown info text, e.g. "Available Saturday" or "Available 11:00 AM – 5:00 PM". */
   scheduleLabel?: string;
   imageUrl?: string | null;
-  onAdd: () => void;
-  onIncrement: () => void;
-  onDecrement: () => void;
+  onOpen: () => void;
 };
 
 function PlaceholderThumbnail() {
@@ -40,13 +38,13 @@ export default function MenuItemCard({
   available,
   scheduleLabel,
   imageUrl,
-  onAdd,
-  onIncrement,
-  onDecrement,
+  onOpen,
 }: MenuItemCardProps) {
   return (
-    <div
-      className={`flex items-start gap-3 rounded-xl border border-maroon/15 bg-white/50 p-3 ${
+    <button
+      type="button"
+      onClick={onOpen}
+      className={`flex w-full items-start gap-3 rounded-xl border border-maroon/15 bg-white/50 p-3 text-left transition-colors hover:border-maroon/40 hover:bg-white/90 ${
         !available ? "opacity-60" : ""
       }`}
     >
@@ -84,46 +82,14 @@ export default function MenuItemCard({
           <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-maroon/20 bg-cream px-2 py-1 text-[10px] font-medium text-ink/50">
             Call to order
           </span>
-        ) : !available ? (
-          <button
-            type="button"
-            disabled
-            className="absolute -right-2 -bottom-2 flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-full border border-maroon/20 bg-cream text-maroon/30 shadow"
-            aria-label={`${name} unavailable`}
-          >
-            +
-          </button>
-        ) : qty === 0 ? (
-          <button
-            type="button"
-            onClick={onAdd}
-            className="absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full bg-maroon text-cream shadow transition-colors hover:bg-maroon-dark"
-            aria-label={`Add ${name}`}
-          >
-            +
-          </button>
         ) : (
-          <div className="absolute -right-2 -bottom-2 flex h-8 items-center gap-2 rounded-full bg-maroon px-2 text-cream shadow">
-            <button
-              type="button"
-              onClick={onDecrement}
-              className="flex h-5 w-5 items-center justify-center text-sm leading-none"
-              aria-label={`Remove one ${name}`}
-            >
-              −
-            </button>
-            <span className="w-3 text-center text-xs font-semibold">{qty}</span>
-            <button
-              type="button"
-              onClick={onIncrement}
-              className="flex h-5 w-5 items-center justify-center text-sm leading-none"
-              aria-label={`Add one more ${name}`}
-            >
-              +
-            </button>
-          </div>
+          qty > 0 && (
+            <span className="absolute -right-2 -bottom-2 flex h-7 min-w-7 items-center justify-center rounded-full bg-maroon px-2 text-xs font-semibold text-cream shadow">
+              {qty}
+            </span>
+          )
         )}
       </div>
-    </div>
+    </button>
   );
 }

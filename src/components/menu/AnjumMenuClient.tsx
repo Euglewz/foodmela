@@ -13,8 +13,10 @@ import { useCartContext } from "@/lib/cart-context";
 import MenuTabs from "@/components/menu/MenuTabs";
 import SearchBar from "@/components/menu/SearchBar";
 import MenuItemCard from "@/components/menu/MenuItemCard";
+import MenuItemDetailModal from "@/components/menu/MenuItemDetailModal";
 import MenuAccordionSection from "@/components/menu/MenuAccordionSection";
 import CartPanel from "@/components/menu/CartPanel";
+import { matchesQuery, menuSuggestions } from "@/lib/menu-search";
 
 const RESTAURANT = "anjum-kabab-ghor" as const;
 
@@ -26,14 +28,26 @@ export default function AnjumMenuClient({ items }: { items: MenuItemDTO[] }) {
     "Ruti / Porota": false,
   });
   const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const cart = useCartContext();
 
   const itemsFor = (category: AnjumCategory) =>
-    items.filter(
-      (item) =>
-        item.category === category &&
-        item.name.toLowerCase().includes(query.toLowerCase()),
-    );
+    items.filter((item) => item.category === category && matchesQuery(item, query));
+
+  const selectedItem = items.find((item) => item.id === selectedId) ?? null;
+
+  function openItem(id: string) {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    // Jump to the tab and section the dish lives in, so it is visible behind the popup.
+    if (item.category === "Midday") {
+      setActiveTab("Midday");
+    } else {
+      setActiveTab("Afternoon/Evening");
+      setOpenSections((prev) => ({ ...prev, [item.category as AnjumCategory]: true }));
+    }
+    setSelectedId(id);
+  }
 
   const cartLines = items
     .filter((item) => cart.qtyOf(RESTAURANT, item.id) > 0)
@@ -54,9 +68,7 @@ export default function AnjumMenuClient({ items }: { items: MenuItemDTO[] }) {
         qty={cart.qtyOf(RESTAURANT, item.id)}
         available={item.isAvailable}
         scheduleLabel={scheduleLabelFor(item)}
-        onAdd={() => cart.increment(RESTAURANT, item.id)}
-        onIncrement={() => cart.increment(RESTAURANT, item.id)}
-        onDecrement={() => cart.decrement(RESTAURANT, item.id)}
+        onOpen={() => setSelectedId(item.id)}
       />
     );
   }
@@ -78,7 +90,13 @@ export default function AnjumMenuClient({ items }: { items: MenuItemDTO[] }) {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
         <div>
           <div className="mb-4">
-            <SearchBar value={query} onChange={setQuery} placeholder="Search the menu" />
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              placeholder="Search the menu"
+              suggestions={menuSuggestions(items, query)}
+              onSelectSuggestion={openItem}
+            />
           </div>
 
           <MenuTabs tabs={ANJUM_TOP_TABS} active={activeTab} onChange={setActiveTab} />
@@ -139,6 +157,18 @@ export default function AnjumMenuClient({ items }: { items: MenuItemDTO[] }) {
           onDecrement={(id) => cart.decrement(RESTAURANT, id)}
         />
       </div>
+
+      {selectedItem && (
+        <MenuItemDetailModal
+          item={selectedItem}
+          cartQty={cart.qtyOf(RESTAURANT, selectedItem.id)}
+          onClose={() => setSelectedId(null)}
+          onConfirm={(qty) => {
+            cart.setQty(RESTAURANT, selectedItem.id, qty);
+            setSelectedId(null);
+          }}
+        />
+      )}
     </div>
   );
 }
