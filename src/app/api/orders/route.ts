@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { accessibleRestaurantIds } from "@/lib/authz";
 import { logActivity } from "@/lib/activity";
+import { retainedOrdersWhere } from "@/lib/order-retention";
 
 const ORDER_INCLUDE = {
   items: true,
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
   }
 
   const orders = await prisma.order.findMany({
-    where,
+    where: { AND: [where, retainedOrdersWhere()] },
     include: ORDER_INCLUDE,
     orderBy: { createdAt: "desc" },
   });

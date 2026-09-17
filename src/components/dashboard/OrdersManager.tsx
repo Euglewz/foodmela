@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatTk } from "@/lib/currency";
+import { formatDeliveryAddress } from "@/lib/delivery";
 import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
 
 type ApiOrder = {
@@ -42,19 +43,29 @@ export default function OrdersManager({
   const [orders, setOrders] = useState<ApiOrder[]>([]);
   const [riders, setRiders] = useState<Rider[]>([]);
   const [loading, setLoading] = useState(true);
+  const tabRef = useRef(tab);
+  const latestRequest = useRef(0);
 
+  // Reloads can finish out of order (e.g. a refresh after "Mark Confirmed" landing after the user
+  // switched tabs), so only the newest request for the tab on screen may update the list.
   async function load() {
+    const requestId = ++latestRequest.current;
+    const scope = tabRef.current;
     setLoading(true);
-    const res = await fetch(`/api/orders?scope=${tab}`);
-    const data = await res.json();
-    setOrders(data.orders ?? []);
-    setLoading(false);
+    try {
+      const res = await fetch(`/api/orders?scope=${scope}`);
+      const data = await res.json();
+      if (requestId !== latestRequest.current) return;
+      setOrders(data.orders ?? []);
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
+    }
   }
 
   useEffect(() => {
+    tabRef.current = tab;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
   useEffect(() => {
@@ -119,7 +130,7 @@ export default function OrdersManager({
                     {order.restaurant.name} · {order.customer.name}
                   </p>
                   <p className="text-xs text-ink/50">
-                    {order.sector}, Road {order.roadNumber} — {order.houseDetails}
+                    {formatDeliveryAddress(order)}
                   </p>
                   <p className="text-xs text-ink/50">
                     {new Date(order.createdAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}

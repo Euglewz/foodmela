@@ -1,5 +1,5 @@
 import { formatTk } from "@/lib/currency";
-import { PAYMENT_METHODS } from "@/lib/delivery";
+import { formatDeliveryAddress, PAYMENT_METHODS } from "@/lib/delivery";
 import type { ActiveOrder } from "@/lib/order-context";
 
 export default function OrderReceipt({ order }: { order: ActiveOrder }) {
@@ -9,7 +9,7 @@ export default function OrderReceipt({ order }: { order: ActiveOrder }) {
   const confirmedAt = new Date(order.confirmedAt);
 
   return (
-    <div className="rounded-2xl border border-maroon/15 bg-white/70 p-6">
+    <div className="rounded-2xl border border-maroon/15 bg-white p-6">
       <div className="text-center">
         <p className="text-xs font-medium tracking-wide text-ink/50 uppercase">
           Receipt
@@ -49,7 +49,7 @@ export default function OrderReceipt({ order }: { order: ActiveOrder }) {
         <div className="flex gap-2">
           <dt className="font-medium text-maroon">Deliver to:</dt>
           <dd className="text-ink/80">
-            {order.sector}, Road {order.roadNumber} — {order.houseDetails}
+            {formatDeliveryAddress(order)}
           </dd>
         </div>
         <div className="flex gap-2">

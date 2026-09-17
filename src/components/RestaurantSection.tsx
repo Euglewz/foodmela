@@ -52,9 +52,9 @@ export default function RestaurantSection({
       </p>
       <Link
         href={menuHref}
-        className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-maroon px-7 py-3 text-sm font-semibold tracking-wide text-cream transition-colors hover:bg-maroon-dark"
+        className="mt-7 inline-flex w-fit items-center gap-3 rounded-full bg-maroon px-[42px] py-[18px] text-[21px] font-semibold tracking-wide text-cream transition-colors hover:bg-maroon-dark"
       >
-        Explore Menu
+        Menu
         <span aria-hidden="true">&rarr;</span>
       </Link>
     </div>

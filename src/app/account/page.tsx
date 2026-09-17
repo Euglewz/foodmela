@@ -2,6 +2,7 @@ import { getCurrentUser, requireRole } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { formatTk } from "@/lib/currency";
 import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
+import { retainedOrdersWhere } from "@/lib/order-retention";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export default async function AccountPage() {
   if (!user) return null;
 
   const orders = await prisma.order.findMany({
-    where: { customerId: user.id },
+    where: { AND: [{ customerId: user.id }, retainedOrdersWhere()] },
     include: { items: true, restaurant: { select: { name: true } }, rider: { select: { name: true, phone: true } } },
     orderBy: { createdAt: "desc" },
   });

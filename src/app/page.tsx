@@ -65,13 +65,13 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/menu/food-mela"
-              className="rounded-full bg-cream px-5 py-2 text-sm font-semibold text-maroon transition-colors hover:bg-white"
+              className="rounded-full bg-cream px-7 py-3 text-base font-semibold text-maroon transition-colors hover:bg-white"
             >
               Order Food Mela
             </Link>
             <Link
               href="/menu/anjum-kabab-ghor"
-              className="rounded-full border border-cream/60 px-5 py-2 text-sm font-semibold text-cream transition-colors hover:bg-cream/10"
+              className="rounded-full border border-cream/60 px-7 py-3 text-base font-semibold text-cream transition-colors hover:bg-cream/10"
             >
               Order Anjum Kabab Ghor
             </Link>

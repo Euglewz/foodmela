@@ -233,7 +233,7 @@ export default function CheckoutPage() {
                   required
                   value={roadNumber}
                   onChange={(e) => setRoadNumber(e.target.value)}
-                  placeholder="e.g. Road 12"
+                  placeholder="e.g. 12"
                   className="rounded-lg border border-maroon/20 bg-white/70 px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-maroon focus:outline-none"
                 />
               </label>
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
                   required
                   value={houseDetails}
                   onChange={(e) => setHouseDetails(e.target.value)}
-                  placeholder="e.g. House 34, 3rd Floor"
+                  placeholder="e.g. 34, 3rd Floor"
                   className="rounded-lg border border-maroon/20 bg-white/70 px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-maroon focus:outline-none"
                 />
               </label>

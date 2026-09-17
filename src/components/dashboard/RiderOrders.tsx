@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatTk } from "@/lib/currency";
+import { formatDeliveryAddress } from "@/lib/delivery";
 import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
 
 type ApiOrder = {
@@ -66,7 +67,7 @@ export default function RiderOrders({ history = false }: { history?: boolean }) 
             <div>
               <p className="font-semibold text-ink">{order.restaurant.name}</p>
               <p className="text-xs text-ink/50">
-                Deliver to: {order.sector}, Road {order.roadNumber} — {order.houseDetails}
+                Deliver to: {formatDeliveryAddress(order)}
               </p>
               <p className="text-xs text-ink/50">
                 Customer: {order.customer.name} {order.customer.phone ? `(${order.customer.phone})` : ""}

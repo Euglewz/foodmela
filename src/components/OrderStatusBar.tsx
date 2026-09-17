@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import { formatTk } from "@/lib/currency";
 import { ORDER_STATUS_LABEL } from "@/lib/order-status";
-import { PAYMENT_METHODS } from "@/lib/delivery";
+import { formatDeliveryAddress, PAYMENT_METHODS } from "@/lib/delivery";
 
 type LiveOrder = {
   id: string;
@@ -69,7 +69,7 @@ export default function OrderStatusBar() {
 
       {showReceipt && (
         <Modal onClose={() => setShowReceipt(false)}>
-          <div className="rounded-2xl border border-maroon/15 bg-white/70 p-6">
+          <div className="rounded-2xl border border-maroon/15 bg-white p-6">
             <div className="text-center">
               <p className="text-xs font-medium tracking-wide text-ink/50 uppercase">Receipt</p>
               <h2 className="mt-1 font-serif text-2xl font-semibold text-maroon">
@@ -110,7 +110,7 @@ export default function OrderStatusBar() {
               <div className="flex gap-2">
                 <dt className="font-medium text-maroon">Deliver to:</dt>
                 <dd className="text-ink/80">
-                  {order.sector}, Road {order.roadNumber} — {order.houseDetails}
+                  {formatDeliveryAddress(order)}
                 </dd>
               </div>
               <div className="flex gap-2">
