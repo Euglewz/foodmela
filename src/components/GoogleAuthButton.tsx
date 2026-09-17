@@ -9,10 +9,10 @@ export function googleErrorMessage(code: string | null | undefined): string | nu
   return GOOGLE_ERRORS[code] ?? null;
 }
 
-export default function GoogleAuthButton({ label }: { label: string }) {
+export default function GoogleAuthButton({ label, href = "/api/auth/google" }: { label: string; href?: string }) {
   return (
     <a
-      href="/api/auth/google"
+      href={href}
       className="flex w-full items-center justify-center gap-3 rounded-full border border-maroon/20 bg-white/80 py-3 text-sm font-semibold text-ink transition-colors hover:bg-white"
     >
       <svg viewBox="0 0 18 18" aria-hidden="true" className="h-[18px] w-[18px]">

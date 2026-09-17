@@ -1,0 +1,16 @@
+{
+  "id": "/app",
+  "name": "Food Mela Manager",
+  "short_name": "FM Manager",
+  "description": "Manage orders, menu and profiles for Food Mela restaurants.",
+  "start_url": "/app",
+  "scope": "/app",
+  "display": "standalone",
+  "background_color": "#f1dfc4",
+  "theme_color": "#832229",
+  "icons": [
+    { "src": "/app-icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/app-icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/app-icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

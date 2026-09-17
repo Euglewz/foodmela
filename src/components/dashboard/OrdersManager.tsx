@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { formatTk } from "@/lib/currency";
 import { formatDeliveryAddress } from "@/lib/delivery";
+import { NEW_ORDERS_EVENT, ORDERS_UPDATED_EVENT } from "@/lib/order-events";
 import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
 
 type ApiOrder = {
@@ -69,6 +70,11 @@ export default function OrdersManager({
   }, [tab]);
 
   useEffect(() => {
+    window.addEventListener(NEW_ORDERS_EVENT, load);
+    return () => window.removeEventListener(NEW_ORDERS_EVENT, load);
+  }, []);
+
+  useEffect(() => {
     if (!canAssignRider) return;
     fetch("/api/users?role=RIDER")
       .then((res) => res.json())
@@ -81,7 +87,10 @@ export default function OrdersManager({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    if (res.ok) load();
+    if (res.ok) {
+      load();
+      window.dispatchEvent(new Event(ORDERS_UPDATED_EVENT));
+    }
   }
 
   async function assignRider(id: string, riderId: string) {

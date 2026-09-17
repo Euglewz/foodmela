@@ -3,6 +3,10 @@ const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const USERINFO_ENDPOINT = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export const GOOGLE_STATE_COOKIE = "fm_oauth_state";
+export const GOOGLE_RETURN_COOKIE = "fm_oauth_return";
+
+// Only a fixed set of return targets is allowed, so the parameter can't be used as an open redirect.
+export const GOOGLE_RETURN_PATHS: Record<string, string> = { app: "/app/login" };
 
 export type GoogleProfile = {
   sub: string;

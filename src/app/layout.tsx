@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusBar from "@/components/OrderStatusBar";
+import SiteChrome from "@/components/SiteChrome";
 import { CartProvider } from "@/lib/cart-context";
 import { OrderProvider } from "@/lib/order-context";
 import "./globals.css";
@@ -37,10 +38,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-cream text-ink">
         <CartProvider>
           <OrderProvider>
-            <Navbar />
-            <main className="flex flex-1 flex-col">{children}</main>
-            <Footer />
-            <OrderStatusBar />
+            <SiteChrome navbar={<Navbar />} footer={<Footer />} overlay={<OrderStatusBar />}>
+              {children}
+            </SiteChrome>
           </OrderProvider>
         </CartProvider>
       </body>
