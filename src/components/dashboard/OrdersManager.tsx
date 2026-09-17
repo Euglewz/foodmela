@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatTk } from "@/lib/currency";
 import { formatDeliveryAddress } from "@/lib/delivery";
 import { NEW_ORDERS_EVENT, ORDERS_UPDATED_EVENT } from "@/lib/order-events";
+import { printOrderReceipt } from "@/lib/print-receipt";
 import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from "@/lib/order-status";
 
 type ApiOrder = {
@@ -33,12 +34,16 @@ const STATUS_FLOW: Record<string, string[]> = {
 
 const DELIVERY_STATUSES = ["OUT_FOR_DELIVERY", "DELIVERED"];
 
+const RECEIPT_STATUSES = ["CONFIRMED", "OUT_FOR_DELIVERY", "DELIVERED"];
+
 export default function OrdersManager({
   canAssignRider = true,
   canMarkDelivery = true,
+  printReceipts = false,
 }: {
   canAssignRider?: boolean;
   canMarkDelivery?: boolean;
+  printReceipts?: boolean;
 }) {
   const [tab, setTab] = useState<"current" | "history">("current");
   const [orders, setOrders] = useState<ApiOrder[]>([]);
@@ -90,6 +95,10 @@ export default function OrdersManager({
     if (res.ok) {
       load();
       window.dispatchEvent(new Event(ORDERS_UPDATED_EVENT));
+      if (printReceipts && status === "CONFIRMED") {
+        const { order } = (await res.json()) as { order: ApiOrder };
+        printOrderReceipt(order);
+      }
     }
   }
 
@@ -165,7 +174,9 @@ export default function OrdersManager({
                 <span className="text-maroon">{formatTk(order.total)}</span>
               </div>
 
-              {(tab === "current" || (canAssignRider && order.status === "CONFIRMED")) && (
+              {(tab === "current" ||
+                (canAssignRider && order.status === "CONFIRMED") ||
+                (printReceipts && RECEIPT_STATUSES.includes(order.status))) && (
                 <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-maroon/15 pt-4">
                   {tab === "current" &&
                     STATUS_FLOW[order.status]
@@ -181,7 +192,17 @@ export default function OrdersManager({
                         </button>
                       ))}
 
-                  {canAssignRider && (
+                  {printReceipts && RECEIPT_STATUSES.includes(order.status) && (
+                    <button
+                      type="button"
+                      onClick={() => printOrderReceipt(order)}
+                      className="rounded-full border border-maroon/20 px-4 py-1.5 text-xs font-semibold text-ink/70 transition-colors hover:bg-maroon/5"
+                    >
+                      🖨️ Print receipt
+                    </button>
+                  )}
+
+                  {canAssignRider && (tab === "current" || order.status === "CONFIRMED") && (
                     <select
                       value={order.rider?.id ?? ""}
                       onChange={(e) => assignRider(order.id, e.target.value)}
